@@ -117,6 +117,11 @@ public class MainScript : MonoBehaviour
     float downDownTime = 0;
     float rightDownTime = 0;
 
+    public GameObject currentLeft = null;
+    public GameObject currentUp = null;
+    public GameObject currentDown = null;
+    public GameObject currentRight = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -369,11 +374,16 @@ public class MainScript : MonoBehaviour
                 {
                     SceneManager.LoadScene(6, LoadSceneMode.Single);
                     PlayerPrefs.SetString("Level", "2");
+                    if (!(PlayerPrefs.GetString("MaxCompletedLevel") == "2"))
+                    {
+                        PlayerPrefs.SetString("MaxCompletedLevel", "1");
+                    }
                 }
                 if (level == "2")
                 {
                     SceneManager.LoadScene(7, LoadSceneMode.Single);
                     PlayerPrefs.SetString("Level", "3");
+                    PlayerPrefs.SetString("MaxCompletedLevel", "2");
                 }
                 if (level == "3")
                 {
@@ -382,7 +392,7 @@ public class MainScript : MonoBehaviour
             }
             if (PlayerPrefs.GetString("Mode") == "free")
             {
-
+                SceneManager.LoadScene(9, LoadSceneMode.Single);
             }
         }
     }
@@ -598,43 +608,6 @@ public class MainScript : MonoBehaviour
                 Object.Destroy(currentRight);
                 Object.Destroy(rightLongBodyInstance);
                 Object.Destroy(rightLongHeadInstance);
-                rightArrows.RemoveAt(0);
-            }
-        }
-
-        //DELETE ARROWS OVER 3
-
-        if (currentLeft != null)
-        {
-            if (currentLeft.transform.position.y < -550)
-            {
-                Object.Destroy(currentLeft);
-                leftArrows.RemoveAt(0);
-            }
-        }
-        if (currentUp != null)
-        {
-            if (currentUp.transform.position.y < -550)
-            {
-                Object.Destroy(currentUp);
-                upArrows.RemoveAt(0);
-            }
-        }
-        if (currentDown != null)
-        {
-            if (currentDown.transform.position.y < -550)
-            {
-                Object.Destroy(currentDown);
-                Object.Destroy(downLongBodyInstance);
-                Object.Destroy(downLongHeadInstance);
-                downArrows.RemoveAt(0);
-            }
-        }
-        if (currentRight != null)
-        {
-            if (currentRight.transform.position.y < -550)
-            {
-                Object.Destroy(currentRight);
                 rightArrows.RemoveAt(0);
             }
         }
