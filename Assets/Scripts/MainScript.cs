@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
 public class MainScript : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class MainScript : MonoBehaviour
     public bool gameOver = false;
 
     public float incTime;
+    public float endTime;
 
     public GameObject left;
     public GameObject up;
@@ -346,6 +348,7 @@ public class MainScript : MonoBehaviour
 
         if (leftTime.Count == 0 && upTime.Count == 0 && downTime.Count == 0 && rightTime.Count == 0 && leftArrows.Count == 0 && upArrows.Count == 0 && downArrows.Count == 0 && rightArrows.Count == 0)
         {
+
             if (score > PlayerPrefs.GetInt(difficulty + level))
             {
                 PlayerPrefs.SetInt(difficulty + level, score);
@@ -353,9 +356,34 @@ public class MainScript : MonoBehaviour
             if (!gameOver)
             {
                 Debug.Log("You win! Your score is " + score);
+                endTime = incTime;
             }
-            Time.timeScale = 0;
             gameOver = true;
+        }
+
+        if (incTime > endTime + 2 && gameOver)
+        {
+            if (PlayerPrefs.GetString("Mode") == "story") 
+            {
+                if (level == "1")
+                {
+                    SceneManager.LoadScene(6, LoadSceneMode.Single);
+                    PlayerPrefs.SetString("Level", "2");
+                }
+                if (level == "2")
+                {
+                    SceneManager.LoadScene(7, LoadSceneMode.Single);
+                    PlayerPrefs.SetString("Level", "3");
+                }
+                if (level == "3")
+                {
+                    SceneManager.LoadScene(9, LoadSceneMode.Single);
+                }
+            }
+            if (PlayerPrefs.GetString("Mode") == "free")
+            {
+
+            }
         }
     }
 
@@ -388,7 +416,6 @@ public class MainScript : MonoBehaviour
         {
             if (!leftDown && Equals(currentLeft.GetComponent<ArrowProps>().type, "s"))
             {
-                Debug.Log(currentLeft.transform.position.y);
                 determineAccuracy(currentLeft);
                 leftArrows.RemoveAt(0);
             }
@@ -425,6 +452,8 @@ public class MainScript : MonoBehaviour
                 leftLongDown = false;
                 determineLongAccuracy(leftDownTime, incTime, currentLeft.GetComponent<ArrowProps>().time, currentLeft.GetComponent<ArrowProps>().duration);
                 Object.Destroy(currentLeft);
+                Object.Destroy(leftLongBodyInstance);
+                Object.Destroy(leftLongHeadInstance);
                 leftArrows.RemoveAt(0);
             }
         }
@@ -451,8 +480,6 @@ public class MainScript : MonoBehaviour
                 }
                 upMultiPressed += 1;
                 upMultiDown = true;
-                Debug.Log(currentUp.GetComponent<ArrowProps>().duration);
-                Debug.Log(upMultiPressed);
                 if (upMultiPressed == currentUp.GetComponent<ArrowProps>().duration)
                 {
                     float multiFinishTime = incTime;
@@ -473,6 +500,8 @@ public class MainScript : MonoBehaviour
                 upLongDown = false;
                 determineLongAccuracy(upDownTime, incTime, currentUp.GetComponent<ArrowProps>().time, currentUp.GetComponent<ArrowProps>().duration);
                 Object.Destroy(currentUp);
+                Object.Destroy(upLongBodyInstance);
+                Object.Destroy(upLongHeadInstance);
                 upArrows.RemoveAt(0);
             }
         }
@@ -531,7 +560,6 @@ public class MainScript : MonoBehaviour
         {
             if (!rightDown && Equals(currentRight.GetComponent<ArrowProps>().type, "s"))
             {
-                Debug.Log(currentRight.transform.position.y);
                 determineAccuracy(currentRight);
                 rightArrows.RemoveAt(0);
             }
@@ -568,6 +596,8 @@ public class MainScript : MonoBehaviour
                 rightLongDown = false;
                 determineLongAccuracy(rightDownTime, incTime, currentRight.GetComponent<ArrowProps>().time, currentRight.GetComponent<ArrowProps>().duration);
                 Object.Destroy(currentRight);
+                Object.Destroy(rightLongBodyInstance);
+                Object.Destroy(rightLongHeadInstance);
                 rightArrows.RemoveAt(0);
             }
         }
@@ -650,11 +680,11 @@ public class MainScript : MonoBehaviour
     {
         Debug.Log("You Lose :(");
         gameOver = true;
+        SceneManager.LoadScene(8, LoadSceneMode.Single);
     }
 
     void determineAccuracy(GameObject arrow)
     {
-        Debug.Log(incTime);
         bool isAccurate = false;
         if (arrow.transform.position.y > -185 && arrow.transform.position.y < -165)
         {
@@ -684,9 +714,7 @@ public class MainScript : MonoBehaviour
     public void determineLongAccuracy(float realStartTime, float endTime, float startTime, float duration)
     {
         float durationAccuracy = (float) (endTime - realStartTime) / duration;
-        float startAccuracy = Mathf.Abs(startTime - realStartTime) + 3f;
-        Debug.Log(startAccuracy);
-        Debug.Log(durationAccuracy);
+        float startAccuracy = Mathf.Abs(startTime - realStartTime) - 3f;
 
         bool isAccurate = false;
         if (startAccuracy < 0.2 && (durationAccuracy < 1.1 && durationAccuracy > 0.9))
